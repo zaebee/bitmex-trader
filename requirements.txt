@@ -1,0 +1,10 @@
+Django==1.10
+djangorestframework==3.5.3
+Pillow==4.0.0
+psycopg2==2.7.1
+uWSGI==2.0.17
+cssmin==0.2.0
+jsmin==2.2.1
+django-extensions==1.7.6
+pytils==0.3
+bitmex==0.2.2
