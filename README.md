@@ -23,5 +23,5 @@ Bitmix strategy trade implementation
 `python manage.py runserver`
 
 ## How to run trader
-`python manage.py runscript rent
+`python manage.py runscript rent`
 
