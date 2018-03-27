@@ -1,5 +1,5 @@
-# whatwhere
-What Where search best events in the world
+# Bitmix trader
+Bitmix strategy trade implementation
 
 ## How to get setup
 0. run `sudo apt-get install postgresql-server-dev-9.5 redis-server binutils python3-dev`
@@ -19,26 +19,9 @@ What Where search best events in the world
     You need install `lessc` compilator `sudo npm install -g less`
     After that you can run `python manage.py collectstatic`
 
-### Load fixtires
-    1. `python manage.py loaddata users places categories`
-
 ### Run developer server
 `python manage.py runserver`
 
 ## How to run trader
 `python manage.py runscript rent
 
-## Translates
-
-### Compile translate
-`python manage.py compilemessages -l ru`
-
-### Make translate
-`python manage.py makemessages -l ru`
-
-### Make translate for frontend
-`python manage.py makemessages -l ru -l en -d djangojs`
-
-
-##
-`python manage.py cities --import  country,region,subregion,city,district`
