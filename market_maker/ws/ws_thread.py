@@ -254,6 +254,7 @@ class BitMEXWebsocket():
 
                 elif action == 'update':
                     self.logger.debug('%s: updating %s' % (table, message['data']))
+                    # TODO make order for reverse side buy/sell
                     # Locate the item in the collection and update it.
                     for updateData in message['data']:
                         item = findItemByKeys(self.keys[table], self.data[table], updateData)

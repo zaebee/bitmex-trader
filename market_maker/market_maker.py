@@ -495,7 +495,7 @@ class OrderManager:
     def exit(self):
         logger.info("Shutting down. All open orders will be cancelled.")
         try:
-            self.exchange.cancel_all_orders()
+            # self.exchange.cancel_all_orders()
             self.exchange.bitmex.exit()
         except errors.AuthenticationError as e:
             logger.info("Was not authenticated; could not cancel orders.")
