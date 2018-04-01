@@ -18,17 +18,29 @@ class RentOrderManager(OrderManager):
         self.running_qty = self.starting_qty
         # self.reset()
 
-    def prepare_order(self, funding_rate):
+    def prepare_reverse_order(self, side):
         ticker = self.get_ticker()
-        if settings.RANDOM_ORDER_SIZE is True:
-            quantity = random.randint(settings.MIN_ORDER_SIZE, settings.MAX_ORDER_SIZE)
-        else:
-            quantity = settings.ORDER_START_SIZE
+        quantity = settings.ORDER_START_SIZE
+        price = ticker['sell'] + 0.5 if side == 'Buy' else ticker['buy'] - 0.5
+        # Open oopsite futures order
+        return {'price': price, 'orderQty': quantity, 'side': 'Sell' if side == 'Buy' else 'Buy'}
 
-        price = ticker['buy'] if funding_rate < 0 else ticker['sell']
-        return {'price': price, 'orderQty': quantity, 'side': "Buy" if funding_rate < 0 else "Sell"}
+    def prepare_order(self, funding_rate, futures=None):
+        symbol = self.exchange.symbol
+        # Open oopsite futures order
+        order = {}
+        if funding_rate < 0:
+            order = self.prepare_reverse_order('Sell')
+        elif funding_rate > 0:
+            order = self.prepare_reverse_order('Buy')
 
-    def place_orders(self):
+        if funding_rate == 0 and futures:
+            # reverse futures order
+            order = self.prepare_reverse_order(futures)
+        if order:
+            return order
+
+    def place_orders(self, futures='sell'):
         """Create order items for use in convergence."""
 
         buy_orders = []
@@ -37,14 +49,22 @@ class RentOrderManager(OrderManager):
         # then we match orders from the outside in, ensuring the fewest number of orders are amended and only
         # a new order is created in the inside. If we did it inside-out, all orders would be amended
         # down and a new order would be created at the outside.
-        funding_rate = self.exchange.get_funding_rate()
+        funding_rate = self.exchange.get_funding_rate('XBTUSD')
         logger.info("Get fundingRate")
         logger.info("Current Position: %.f, Funding Rate: %.6f" %
                     (self.exchange.get_delta(), funding_rate))
 
-        if not self.long_position_limit_exceeded() and funding_rate > 0:
-            buy_orders.append(self.prepare_order(funding_rate))
-        if not self.short_position_limit_exceeded() and funding_rate < 0:
-            sell_orders.append(self.prepare_order(funding_rate))
+        if self.exchange.symbol == 'XBTUSD':
+            if not self.long_position_limit_exceeded() and funding_rate < 0:
+                buy_orders.append(self.prepare_order(funding_rate))
+            if not self.short_position_limit_exceeded() and funding_rate > 0:
+                sell_orders.append(self.prepare_order(funding_rate))
+        #  open reverse futures
+        else:
+            if not self.short_position_limit_exceeded() and funding_rate < 0:
+               sell_orders.append(self.prepare_order(0, 'Buy'))
+            if not self.long_position_limit_exceeded() and funding_rate > 0:
+                buy_orders.append(self.prepare_order(0, 'Sell'))
+
 
         return self.converge_orders(buy_orders, sell_orders)

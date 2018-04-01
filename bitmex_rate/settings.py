@@ -248,7 +248,7 @@ WATCHED_FILES = []
 ########################################################################################################################
 
 # Specify the contracts that you hold. These will be used in portfolio calculations.
-CONTRACTS = ['XBTUSD']
+CONTRACTS = ['XBTUSD', 'XBTM18']
 
 RANDOM_ORDER_SIZE = False
 MIN_ORDER_SIZE = 1
