@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    {% load i18n staticfiles %}
+    <meta charset="utf-8">
+    <title>Bitmex Traider</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fff">
+    <meta name="format-detection" content="telephone=no">
+
+    {% block metadata %}
+      <meta property="og:title" content="Bitmex Traider">
+      <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+      <meta property="og:url" content="{% block og_url %}http://{{ request.get_host }}{% endblock %}">
+      <meta property="og:image" content="{% block og_image %}http://{{ request.get_host }}/static/images/fb-share-05x.png{% endblock %}">
+      <meta property="og:site_name" content="bitmex.opt.my">
+      <meta property="og:description" content="">
+      <meta name="description" content="">
+    {% endblock %}
+
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.png' %}">
+
+    <!-- Included CSS Files (Compressed) -->
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,300i,400,400i,500,500i,700,700i&amp;subset=cyrillic-ext" rel="stylesheet">
+      <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.20.0/dist/material-components-web.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="b-site">
+      <div id="app"><router-view></router-view></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <!--<script src="https://unpkg.com/bootstrap-vue/dist/bootstrapVue.js"></script>-->
+    <script src="{% static 'strategies/js/build.js' %}"></script>
+  </body>
+</html>
