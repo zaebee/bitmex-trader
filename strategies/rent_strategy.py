@@ -23,7 +23,11 @@ class RentOrderManager(OrderManager):
         quantity = settings.ORDER_START_SIZE
         price = ticker['sell'] + 0.5 if side == 'Buy' else ticker['buy'] - 0.5
         # Open oopsite futures order
-        return {'price': price, 'orderQty': quantity, 'side': 'Sell' if side == 'Buy' else 'Buy'}
+        return {
+            'price': price,
+            'orderQty': quantity,
+            'side': 'Sell' if side == 'Buy' else 'Buy'
+        }
 
     def prepare_order(self, funding_rate, futures=None):
         symbol = self.exchange.symbol
@@ -54,12 +58,13 @@ class RentOrderManager(OrderManager):
         logger.info("Current Position: %.f, Funding Rate: %.6f" %
                     (self.exchange.get_delta(), funding_rate))
 
+        # XBTUSD
         if symbol == self.exchange.symbol:
             if not self.long_position_limit_exceeded() and funding_rate < 0:
                 buy_orders.append(self.prepare_order(funding_rate))
             if not self.short_position_limit_exceeded() and funding_rate > 0:
                 sell_orders.append(self.prepare_order(funding_rate))
-        #  open reverse futures
+        # XBTM18
         elif symbol == self.exchange.futures_symbol:
             if not self.short_position_limit_exceeded() and funding_rate < 0:
                sell_orders.append(self.prepare_order(0, 'Buy'))

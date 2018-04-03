@@ -147,18 +147,6 @@ except:
     pass
 
 
-# API URL.
-BITMEX_BASE_URL = "https://testnet.bitmex.com/api/v1/"
-
-# The BitMEX API requires permanent API keys. Go to https://testnet.bitmex.com/api/apiKeys to fill these out.
-BITMEX_API_KEY = ""
-BITMEX_API_SECRET = ""
-
-BITMEX_API_KEY = ''
-BITMEX_API_SECRET = ''
-
-ORDERID_PREFIX = "rent_bitmex_"
-
 try:
     from . settings_local import *
 except:

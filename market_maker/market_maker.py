@@ -262,8 +262,8 @@ class OrderManager:
         logger.info("Contracts Traded This Run: %d" % (self.running_qty - self.starting_qty))
         logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
 
-    def get_ticker(self):
-        ticker = self.exchange.get_ticker()
+    def get_ticker(self, symbol=None):
+        ticker = self.exchange.get_ticker(symbol)
         tickLog = self.exchange.get_instrument()['tickLog']
 
         # Set up our buy & sell positions as the smallest possible unit above and below the current spread
