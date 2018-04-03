@@ -132,6 +132,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = rel('media')
 
 try:
-    from bitmex_settings import *
+    from . bitmex_settings import *
+except:
+    pass
+
+try:
+    from . settings_local import *
 except:
     pass
