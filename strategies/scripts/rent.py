@@ -9,10 +9,11 @@ def run(*args):
     # Try/except just keeps ctrl-c from printing an ugly stacktrace
     try:
         usd_manager.init()
-        m18_manager.init()
         usd_manager.place_orders()
+        # TODO m18 get message from usd channel
+        m18_manager.init()
         m18_manager.place_orders()
-        # om.run_loop()
-        return usd_manager, m18_manager
+        # m18_manager.run_loop()
+        # return usd_manager, m18_manager
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
