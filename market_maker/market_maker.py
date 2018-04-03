@@ -26,7 +26,7 @@ class ExchangeInterface:
         self.dry_run = dry_run
         self.symbol = kwargs.get('symbol', settings.SYMBOL)
 
-        base_url = kwargs.get('BASE_URL', settings.BASE_URL)
+        base_url = kwargs.get('BASE_URL', settings.BITMEX_BASE_URL)
         apiKey = kwargs.get('API_KEY', settings.BITMEX_API_KEY)
         apiSecret = kwargs.get('API_SECRET', settings.BITMEX_API_SECRET)
         orderIDPrefix = kwargs.get('ORDERID_PREFIX', settings.ORDERID_PREFIX)
