@@ -14,8 +14,6 @@ from market_maker.utils import log, constants, errors, math
 
 # Used for reloading the bot - saves modified times of key files
 import os
-watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
-
 
 #
 # Helpers
@@ -27,11 +25,22 @@ class ExchangeInterface:
     def __init__(self, dry_run=False, **kwargs):
         self.dry_run = dry_run
         self.symbol = kwargs.get('symbol', settings.SYMBOL)
-        logger.info("%s" % settings.SYMBOL)
-        self.bitmex = bitmex.BitMEX(base_url=settings.BASE_URL, symbol=self.symbol,
-                                    apiKey=settings.API_KEY, apiSecret=settings.API_SECRET,
-                                    orderIDPrefix=settings.ORDERID_PREFIX, postOnly=settings.POST_ONLY,
-                                    timeout=settings.TIMEOUT)
+
+        base_url = kwargs.get('BASE_URL', settings.BASE_URL)
+        apiKey = kwargs.get('API_KEY', settings.BITMEX_API_KEY)
+        apiSecret = kwargs.get('API_SECRET', settings.BITMEX_API_SECRET)
+        orderIDPrefix = kwargs.get('ORDERID_PREFIX', settings.ORDERID_PREFIX)
+
+        logger.info("%s" % self.symbol)
+        self.bitmex = bitmex.BitMEX(
+            symbol=self.symbol,
+            base_url=base_url,
+            apiKey=apiKey,
+            apiSecret=apiSecret,
+            orderIDPrefix=orderIDPrefix,
+            postOnly=settings.POST_ONLY,
+            timeout=settings.TIMEOUT
+        )
 
     def cancel_order(self, order):
         tickLog = self.get_instrument()['tickLog']
@@ -203,12 +212,12 @@ class ExchangeInterface:
 
 class OrderManager:
     def __init__(self, **kwargs):
-        symbol = kwargs.get('symbol')
+        symbol = kwargs.get('symbol', settings.SYMBOL)
         self.exchange = ExchangeInterface(settings.DRY_RUN, symbol=symbol)
         # Once exchange is created, register exit handler that will always cancel orders
         # on any error.
-        atexit.register(self.exit)
-        signal.signal(signal.SIGTERM, self.exit)
+        # atexit.register(self.exit)
+        # signal.signal(signal.SIGTERM, self.exit)
 
         logger.info("Using symbol %s." % self.exchange.symbol)
 
@@ -231,9 +240,6 @@ class OrderManager:
 
         # Create orders and converge.
         self.place_orders()
-
-        if settings.DRY_RUN:
-            sys.exit()
 
     def print_status(self):
         """Print the current MM status."""
@@ -482,12 +488,6 @@ class OrderManager:
     # Running
     ###
 
-    def check_file_change(self):
-        """Restart if any files we're watching have changed."""
-        for f, mtime in watched_files_mtimes:
-            if getmtime(f) > mtime:
-                self.restart()
-
     def check_connection(self):
         """Ensure the WS connections are still open."""
         return self.exchange.is_open()
@@ -502,14 +502,11 @@ class OrderManager:
         except Exception as e:
             logger.info("Unable to cancel orders: %s" % e)
 
-        sys.exit()
-
     def run_loop(self):
         while True:
             sys.stdout.write("-----\n")
             sys.stdout.flush()
 
-            self.check_file_change()
             sleep(settings.LOOP_INTERVAL)
 
             # This will restart on very short downtime, but if it's longer,
@@ -543,19 +540,3 @@ def cost(instrument, quantity, price):
 
 def margin(instrument, quantity, price):
     return cost(instrument, quantity, price) * instrument["initMargin"]
-
-
-def run():
-    if len(sys.argv) == 2:
-        symbol = sys.argv[1]
-    else:
-        symbol = 'XBTUSD'
-    logger.info('BitMEX Market Maker Version: %s\n' % constants.VERSION)
-
-    om = OrderManager(symbol=symbol)
-    # Try/except just keeps ctrl-c from printing an ugly stacktrace
-    try:
-        om.init()
-        om.run_loop()
-    except (KeyboardInterrupt, SystemExit):
-        sys.exit()

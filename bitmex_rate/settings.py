@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'strategies',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +77,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'bitmex_rate.wsgi.application'
+ASGI_APPLICATION = "bitmex_rate.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
