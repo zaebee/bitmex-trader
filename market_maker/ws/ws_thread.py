@@ -37,19 +37,24 @@ class BitMEXWebsocket():
     def __del__(self):
         self.exit()
 
-    def connect(self, endpoint="", symbol="XBTN15", shouldAuth=True):
+    def connect(self, endpoint="", symbol="XBTUSD", futures_symbol='XBTM18', shouldAuth=True):
         '''Connect to the websocket and initialize data stores.'''
 
         self.logger.debug("Connecting WebSocket.")
         self.symbol = symbol
+        self.futures_symbol = futures_symbol
         self.shouldAuth = shouldAuth
 
         # We can subscribe right in the connection querystring, so let's build that.
         # Subscribe to all pertinent endpoints
         subscriptions = [sub + ':' + symbol for sub in ["quote", "trade"]]
+        if futures_symbol:
+            subscriptions = [sub + ':' + futures_symbol for sub in ["quote", "trade"]]
         subscriptions += ["instrument"]  # We want all of them
         if self.shouldAuth:
             subscriptions += [sub + ':' + symbol for sub in ["order", "execution"]]
+            if futures_symbol:
+                subscriptions += [sub + ':' + futures_symbol for sub in ["order", "execution"]]
             subscriptions += ["margin", "position"]
 
         # Get WS URL and connect.

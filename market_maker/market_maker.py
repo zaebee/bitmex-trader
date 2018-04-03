@@ -25,6 +25,7 @@ class ExchangeInterface:
     def __init__(self, dry_run=False, **kwargs):
         self.dry_run = dry_run
         self.symbol = kwargs.get('symbol', settings.SYMBOL)
+        self.futures_symbol = kwargs.get('futures_symbol', settings.FUTURES_SYMBOL)
 
         base_url = kwargs.get('BASE_URL', settings.BITMEX_BASE_URL)
         apiKey = kwargs.get('API_KEY', settings.BITMEX_API_KEY)
@@ -34,6 +35,7 @@ class ExchangeInterface:
         logger.info("%s" % self.symbol)
         self.bitmex = bitmex.BitMEX(
             symbol=self.symbol,
+            futures_symbol=self.futures_symbol,
             base_url=base_url,
             apiKey=apiKey,
             apiSecret=apiSecret,

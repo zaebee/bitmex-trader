@@ -17,12 +17,13 @@ class BitMEX(object):
 
     """BitMEX API Connector."""
 
-    def __init__(self, base_url=None, symbol=None, apiKey=None, apiSecret=None,
+    def __init__(self, base_url=None, symbol=None, futures_symbol=None, apiKey=None, apiSecret=None,
                  orderIDPrefix='mm_bitmex_', shouldWSAuth=True, postOnly=False, timeout=7):
         """Init connector."""
         self.logger = logging.getLogger('root')
         self.base_url = base_url
         self.symbol = symbol
+        self.futures_symbol = futures_symbol
         self.postOnly = postOnly
         if (apiKey is None):
             raise Exception("Please set an API key and Secret to get started. See " +
@@ -44,7 +45,7 @@ class BitMEX(object):
 
         # Create websocket for streaming data
         self.ws = BitMEXWebsocket()
-        self.ws.connect(base_url, symbol, shouldAuth=shouldWSAuth)
+        self.ws.connect(base_url, symbol, futures_symbol, shouldAuth=shouldWSAuth)
 
         self.timeout = timeout
 

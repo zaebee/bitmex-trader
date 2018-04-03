@@ -9,7 +9,6 @@ class StrategyConsumer(AsyncWebsocketConsumer):
         self.token_secret = self.scope['url_route']['kwargs']['token_secret']
 
         self.manager = RentOrderManager(symbol='XBTUSD')
-        # self.XBTM18 = RentOrderManager(symbol='XBTM18')
 
         self.manager.init()
 
@@ -27,6 +26,9 @@ class StrategyConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
+        """
+        Recieve text message with command start/close/check/list for trader.
+        """
         text_data_json = json.loads(text_data)
         message = text_data_json.get('message')
 
@@ -39,13 +41,16 @@ class StrategyConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-
     async def chat_message(self, event):
         message = event['message']
         if message == 'run XBTUSD':
             self.manager.place_orders()
-        if message == 'run XBTM18':
+        elif message == 'run XBTM18':
             pass
+            # self.manager.place_orders()
+        elif 'close' in message.lower():
+            pass
+            # TODO run mamager.loop for check exit conditions
             # self.manager.place_orders()
 
         # Send message to WebSocket
