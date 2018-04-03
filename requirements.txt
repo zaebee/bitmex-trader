@@ -10,4 +10,3 @@ pytils==0.3
 bitmex==0.2.2
 channels-redis==2.1.1
 channels==2.0.2
-channels-redis==2.1.1
