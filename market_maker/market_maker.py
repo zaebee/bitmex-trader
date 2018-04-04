@@ -118,20 +118,25 @@ class ExchangeInterface:
     def calc_pts_delta(self):
         """Calculate currency delta for portfolio"""
         portfolio = self.get_portfolio()
+        delta = {}
         pts_delta = 0
         for symbol in portfolio:
             item = portfolio[symbol]
             if item['currentQty'] > 0:
                 # long
-                delta = item['avgExitPrice'] - item['avgEntryPrice']
+                profit = item['avgExitPrice'] - item['avgEntryPrice']
             elif item['currentQty'] < 0:
                 # short
-                delta = item['avgEntryPrice'] - item['avgExitPrice']
+                profit = item['avgEntryPrice'] - item['avgExitPrice']
 
-            pts_delta += delta
-        delta = {
-            "basis": pts_delta
-        }
+            pts_delta += profit
+            item = {
+                'qty': item['currentQty'],
+                'entry': item['avgEntryPrice'],
+                'exit': item['avgExitPrice'],
+            }
+            delta.update({symbol: item})
+        delta['basis'] = pts_delta
         return delta
 
     def calc_delta(self):
