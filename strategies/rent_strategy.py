@@ -20,9 +20,15 @@ class RentOrderManager(OrderManager):
 
     def prepare_reverse_order(self, side, symbol):
         ticker = self.get_ticker(symbol)
-        quantity = settings.ORDER_START_SIZE
+        delta = self.exchange.get_delta(self.exchange.symbol)
+        futures_delta = self.exchange.get_delta(self.exchange.futures_symbol)
+
+        quantity = abs(delta + futures_delta)
+        if not quantity:
+            multi = settings.ORDER_MULTI
+            quantity = int(self.exchange.get_margin()['withdrawableMargin'] * multi)
         price = ticker['sell'] + 0.5 if side == 'Buy' else ticker['buy'] - 0.5
-        # Open oopsite futures order
+        # Open oppsite futures order
         return {
             'price': price,
             'orderQty': quantity,
@@ -71,5 +77,4 @@ class RentOrderManager(OrderManager):
             if not self.long_position_limit_exceeded() and funding_rate > 0:
                 buy_orders.append(self.prepare_order(0, 'Sell'))
 
-
-        return self.converge_orders(buy_orders, sell_orders)
+        return self.converge_orders(buy_orders, sell_orders, symbol)

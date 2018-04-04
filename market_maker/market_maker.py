@@ -82,6 +82,7 @@ class ExchangeInterface:
         for symbol in contracts:
             position = self.bitmex.position(symbol=symbol)
             instrument = self.bitmex.instrument(symbol=symbol)
+            ticker = self.bitmex.ticker_data(symbol)
 
             if instrument['isQuanto']:
                 future_type = "Quanto"
@@ -99,6 +100,8 @@ class ExchangeInterface:
 
             portfolio[symbol] = {
                 "currentQty": float(position['currentQty']),
+                "avgEntryPrice":float(position['avgEntryPrice']),
+                "avgExitPrice": float(ticker['mid']),
                 "futureType": future_type,
                 "multiplier": multiplier,
                 "markPrice": float(instrument['markPrice']),
@@ -111,6 +114,25 @@ class ExchangeInterface:
         if symbol is None:
             symbol = self.symbol
         return self.get_instrument(symbol)['fundingRate'] or 0
+
+    def calc_pts_delta(self):
+        """Calculate currency delta for portfolio"""
+        portfolio = self.get_portfolio()
+        pts_delta = 0
+        for symbol in portfolio:
+            item = portfolio[symbol]
+            if item['currentQty'] > 0:
+                # long
+                delta = item['avgExitPrice'] - item['avgEntryPrice']
+            elif item['currentQty'] < 0:
+                # short
+                delta = item['avgEntryPrice'] - item['avgExitPrice']
+
+            pts_delta += delta
+        delta = {
+            "basis": pts_delta
+        }
+        return delta
 
     def calc_delta(self):
         """Calculate currency delta for portfolio"""
@@ -201,10 +223,10 @@ class ExchangeInterface:
             return orders
         return self.bitmex.amend_bulk_orders(orders)
 
-    def create_bulk_orders(self, orders):
+    def create_bulk_orders(self, orders, symbol=None):
         if self.dry_run:
             return orders
-        return self.bitmex.create_bulk_orders(orders)
+        return self.bitmex.create_bulk_orders(orders, symbol)
 
     def cancel_bulk_orders(self, orders):
         if self.dry_run:
@@ -352,12 +374,13 @@ class OrderManager:
 
         return {'price': price, 'orderQty': quantity, 'side': "Buy" if index < 0 else "Sell"}
 
-    def converge_orders(self, buy_orders, sell_orders):
+    def converge_orders(self, buy_orders, sell_orders, symbol=None):
         """Converge the orders we currently have in the book with what we want to be in the book.
            This involves amending any open orders and creating new ones if any have filled completely.
            We start from the closest orders outward."""
 
-        tickLog = self.exchange.get_instrument()['tickLog']
+        symbol = symbol or self.exchange.symbol
+        tickLog = self.exchange.get_instrument(symbol)['tickLog']
         to_amend = []
         to_create = []
         to_cancel = []
@@ -418,13 +441,13 @@ class OrderManager:
                     return self.place_orders()
                 else:
                     logger.error("Unknown error on amend: %s. Exiting" % errorObj)
-                    sys.exit(1)
+                    # sys.exit(1)
 
         if len(to_create) > 0:
             logger.info("Creating %d orders:" % (len(to_create)))
             for order in reversed(to_create):
                 logger.info("%4s %d @ %.*f" % (order['side'], order['orderQty'], tickLog, order['price']))
-            self.exchange.create_bulk_orders(to_create)
+            self.exchange.create_bulk_orders(to_create, symbol)
 
         # Could happen if we exceed a delta limit
         if len(to_cancel) > 0:
