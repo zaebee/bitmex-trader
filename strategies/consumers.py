@@ -44,10 +44,9 @@ class StrategyConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
         if message == 'run XBTUSD':
-            self.manager.place_orders()
+            self.manager.place_orders('XBTUSD')
         elif message == 'run XBTM18':
-            pass
-            # self.manager.place_orders()
+            self.manager.place_orders('XBTM18')
         elif 'close' in message.lower():
             pass
             # TODO run mamager.loop for check exit conditions
