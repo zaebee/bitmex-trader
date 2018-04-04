@@ -24,7 +24,9 @@ class RentOrderManager(OrderManager):
         futures_delta = self.exchange.get_delta(self.exchange.futures_symbol)
 
         quantity = abs(delta + futures_delta)
-        if not quantity:
+        if not quantity and delta:
+            quantity = abs(delta)
+        elif not quantity:
             multi = settings.ORDER_MULTI
             quantity = int(self.exchange.get_margin()['withdrawableMargin'] * multi)
         price = ticker['sell'] + 0.5 if side == 'Buy' else ticker['buy'] - 0.5

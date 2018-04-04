@@ -100,12 +100,12 @@ class ExchangeInterface:
 
             portfolio[symbol] = {
                 "currentQty": float(position['currentQty']),
-                "avgEntryPrice":float(position['avgEntryPrice']),
-                "avgExitPrice": float(ticker['mid']),
+                "avgEntryPrice":float(position['avgEntryPrice'] or 0),
+                "avgExitPrice": float(ticker['mid'] or 0),
                 "futureType": future_type,
                 "multiplier": multiplier,
-                "markPrice": float(instrument['markPrice']),
-                "spot": float(instrument['indicativeSettlePrice'])
+                "markPrice": float(instrument['markPrice'] or 0),
+                "spot": float(instrument['indicativeSettlePrice'] or 0)
             }
 
         return portfolio
@@ -120,6 +120,7 @@ class ExchangeInterface:
         portfolio = self.get_portfolio()
         delta = {}
         pts_delta = 0
+        profit = 0
         for symbol in portfolio:
             item = portfolio[symbol]
             if item['currentQty'] > 0:

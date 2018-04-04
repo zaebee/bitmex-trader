@@ -191,8 +191,8 @@ class BitMEXWebsocket():
         nonce = generate_nonce()
         return [
             "api-nonce: " + str(nonce),
-            "api-signature: " + generate_signature(settings.API_SECRET, 'GET', '/realtime', nonce, ''),
-            "api-key:" + settings.API_KEY
+            "api-signature: " + generate_signature(settings.BITMEX_API_SECRET, 'GET', '/realtime', nonce, ''),
+            "api-key:" + settings.BITMEX_API_KEY
         ]
 
     def __wait_for_account(self):
