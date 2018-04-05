@@ -77,7 +77,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'bitmex_rate.wsgi.application'
-ASGI_APPLICATION = "bitmex_rate.routing.application"
+ASGI_APPLICATION = 'bitmex_rate.routing.application'
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
