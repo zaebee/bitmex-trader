@@ -190,7 +190,7 @@ class BitMEX(object):
         orders = self._curl_bitmex(
             path=path,
             query={
-                'filter': json.dumps({'ordStatus.isTerminated': False, 'symbol': self.symbol}),
+                'filter': json.dumps({'ordStatus.isTerminated': False}),
                 'count': 500
             },
             verb="GET"
