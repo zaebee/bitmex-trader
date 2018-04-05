@@ -65,8 +65,8 @@ class RentOrderManager(OrderManager):
         # XBTM18
         elif symbol == self.exchange.futures_symbol:
             if not self.short_position_limit_exceeded() and self.funding_rate < 0:
-               sell_orders.append(self.prepare_order('Sell'), symbol)
+               sell_orders.append(self.prepare_order('Sell', symbol))
             if not self.long_position_limit_exceeded() and self.funding_rate > 0:
-                buy_orders.append(self.prepare_order('Buy'), symbol)
+                buy_orders.append(self.prepare_order('Buy', symbol))
 
         return self.converge_orders(buy_orders, sell_orders, symbol)
