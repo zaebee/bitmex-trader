@@ -4,6 +4,7 @@ import json
 from . rent_strategy import RentOrderManager
 
 class StrategyConsumer(AsyncWebsocketConsumer):
+
     async def connect(self):
         self.token_key = self.scope['url_route']['kwargs']['token_key']
         self.token_secret = self.scope['url_route']['kwargs']['token_secret']
@@ -42,15 +43,16 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             )
 
     async def chat_message(self, event):
-        message = event['message']
-        if message == 'run XBTUSD':
+        message = event['message'].upper()
+        if message == 'RUN XBTUSD':
             self.manager.place_orders('XBTUSD')
-        elif message == 'run XBTM18':
+
+        elif message == 'RUN XBTM18':
             self.manager.place_orders('XBTM18')
-        elif 'close' in message.lower():
-            pass
-            # TODO run mamager.loop for check exit conditions
-            # self.manager.place_orders()
+
+        elif 'RUN DELTA' in message.lower():
+            delta = self.manager.exchange.calc_pts_delta()
+            message = delta
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
