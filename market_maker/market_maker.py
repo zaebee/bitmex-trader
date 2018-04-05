@@ -242,8 +242,8 @@ class ExchangeInterface:
 
 class OrderManager:
     def __init__(self, **kwargs):
-        symbol = kwargs.get('symbol', settings.SYMBOL)
-        self.exchange = ExchangeInterface(settings.DRY_RUN, symbol=symbol)
+        symbol = kwargs.pop('symbol', settings.SYMBOL)
+        self.exchange = ExchangeInterface(settings.DRY_RUN, symbol=symbol, **kwargs)
         # Once exchange is created, register exit handler that will always cancel orders
         # on any error.
         # atexit.register(self.exit)
