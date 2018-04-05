@@ -1,5 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
-from time import sleep
+from datetime import datetime
 import json
 
 from . rent_strategy import RentOrderManager
@@ -72,11 +72,18 @@ class StrategyConsumer(AsyncWebsocketConsumer):
 
         elif command == 'DELTA':
             delta = self.manager.exchange.calc_pts_delta()
-            text = 'Delta: %.4f' % delta.get('basis')
-            title = 'XBTUSD: %s' % str(delta.get('XBTUSD'))
-            subtitle = 'XBTM18: %s' % str(delta.get('XBTM18'))
+
+            XBTUSD = 'XBTUSD:%s' % str(delta.get('XBTUSD'))
+            XBTM18 = 'XBTM18%s' % str(delta.get('XBTM18'))
+            title = 'Delta: %.4f' % delta.get('basis')
+
+            items = [
+                {'title': 'XBTUSD', 'description': XBTUSD},
+                {'title': 'XBTM18', 'description': XBTM18}
+            ]
+
             response['result']['fulfillment']['messages'].append(
-                self.prepare_message(text, title, subtitle)
+                self.prepare_message(title=title, subtitle=XBTUSD, text=XBTM18)
             )
 
         # Send message to WebSocket
@@ -94,12 +101,15 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             }
         }
 
-    def prepare_message(self, text, title=None, subtitle=None):
+    def prepare_message(self, text=None, title=None, subtitle=None, items=[], basic_type='basic_card'):
+        createdAt = datetime.now()
         return {
-            'type': 'basic_card',
+            'type': basic_type,
             'image': None,
             'buttons': [],
+            'items': items,
             'title': title,
             'subtitle': subtitle,
             'formattedText': text,
+            'createdAt': createdAt.isoformat(),
         }
