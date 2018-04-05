@@ -34,6 +34,8 @@ class RentOrderManager(OrderManager):
         quantity = abs(delta + futures_delta)
         if not quantity and delta:
             quantity = min([abs(delta), available_quantity])
+        elif not quantity and not delta:
+            quantity = available_quantity
         price = ticker['sell'] + 0.5 if side == 'Sell' else ticker['buy'] - 0.5
         return {
             'side': side,
