@@ -1,4 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
+from time import sleep
 import json
 
 from . rent_strategy import RentOrderManager
@@ -58,6 +59,16 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Opening orders XBTM18')
             )
+
+        elif command == 'DELTA ON':
+            delta = self.manager.exchange.calc_pts_delta()
+            text = 'Delta: %.4f' % delta.get('basis')
+            response['result']['fulfillment']['messages'].append(
+                self.prepare_message(text)
+            )
+            self.send(text_data=json.dumps({
+                'message': response
+            }))
 
         elif command == 'DELTA':
             delta = self.manager.exchange.calc_pts_delta()
