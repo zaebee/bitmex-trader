@@ -80,12 +80,12 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             }))
 
         elif 'EXIT' == command:
-            manager = RentOrderManager(symbol='XBTUSD', POST_ONLY=False)
+            manager = RentOrderManager(POST_ONLY=False)
             manager.init()
             delta = manager.exchange.calc_pts_delta()
             if delta['basis'] > 0:
-                self.manager.place_orders('XBTUSD', stop=True)
-                self.manager.place_orders('XBTM18', stop=True)
+                self.manager.place_stop_orders('XBTUSD')
+                manager.place_stop_orders('XBTM18')
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Exit')
             )
