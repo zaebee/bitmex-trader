@@ -31,6 +31,7 @@ class ExchangeInterface:
         apiKey = kwargs.get('API_KEY', settings.BITMEX_API_KEY)
         apiSecret = kwargs.get('API_SECRET', settings.BITMEX_API_SECRET)
         orderIDPrefix = kwargs.get('ORDERID_PREFIX', settings.ORDERID_PREFIX)
+        postOnly = kwargs.get('POST_ONLY', settings.POST_ONLY)
 
         logger.info("%s" % self.symbol)
         self.bitmex = bitmex.BitMEX(
@@ -40,7 +41,7 @@ class ExchangeInterface:
             apiKey=apiKey,
             apiSecret=apiSecret,
             orderIDPrefix=orderIDPrefix,
-            postOnly=settings.POST_ONLY,
+            postOnly=postOnly,
             timeout=settings.TIMEOUT
         )
 

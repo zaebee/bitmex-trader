@@ -158,7 +158,7 @@ class BitMEX(object):
             'symbol': self.symbol,
             'orderQty': quantity,
             'price': price,
-            'clOrdID': clOrdID
+            'clOrdID': clOrdID,
         }
         return self._curl_bitmex(path=endpoint, postdict=postdict, verb="POST")
 
@@ -176,6 +176,9 @@ class BitMEX(object):
             order['symbol'] = symbol or self.symbol
             if self.postOnly:
                 order['execInst'] = 'ParticipateDoNotInitiate'
+            else:
+                del order['price']
+                order['ordType'] = 'Market'
         return self._curl_bitmex(path='order/bulk', postdict={'orders': orders}, verb='POST')
 
     @authentication_required

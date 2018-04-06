@@ -36,14 +36,16 @@ class RentOrderManager(OrderManager):
             quantity = min([abs(delta), available_quantity])
         elif not quantity and not delta:
             quantity = available_quantity
+
         price = ticker['sell'] + 0.5 if side == 'Sell' else ticker['buy'] - 0.5
-        return {
+        order = {
             'side': side,
             'price': price,
             'orderQty': quantity,
         }
+        return order
 
-    def place_orders(self, symbol='XBTUSD', closing=False):
+    def place_orders(self, symbol='XBTUSD', side=None):
         """Create order items for use in convergence."""
 
         buy_orders = []
@@ -52,21 +54,46 @@ class RentOrderManager(OrderManager):
         # then we match orders from the outside in, ensuring the fewest number of orders are amended and only
         # a new order is created in the inside. If we did it inside-out, all orders would be amended
         # down and a new order would be created at the outside.
-        logger.info("Get fundingRate")
         logger.info("Current Position: %.f, Funding Rate: %.6f" %
                     (self.exchange.get_delta(), self.funding_rate))
 
         # XBTUSD
         if symbol == self.exchange.symbol:
             if not self.long_position_limit_exceeded() and self.funding_rate < 0:
-                buy_orders.append(self.prepare_order('Buy'))
-            if not self.short_position_limit_exceeded() and self.funding_rate > 0:
-                sell_orders.append(self.prepare_order('Sell'))
+                side = side if side else 'Buy'
+                buy_orders.append(self.prepare_order(side, symbol))
+            elif not self.short_position_limit_exceeded() and self.funding_rate > 0:
+                side = side if side else 'Sell'
+                sell_orders.append(self.prepare_order(side, symbol))
         # XBTM18
         elif symbol == self.exchange.futures_symbol:
             if not self.short_position_limit_exceeded() and self.funding_rate < 0:
-               sell_orders.append(self.prepare_order('Sell', symbol))
-            if not self.long_position_limit_exceeded() and self.funding_rate > 0:
+                side = side if side else 'Sell'
+                sell_orders.append(self.prepare_order(side, symbol))
+            elif not self.long_position_limit_exceeded() and self.funding_rate > 0:
+                side = side if side else 'Buy'
+                buy_orders.append(self.prepare_order(side, symbol))
+
+        return self.converge_orders(buy_orders, sell_orders, symbol)
+
+    def place_stop_orders(self, symbol='XBTUSD'):
+        """Create order items for use in convergence."""
+
+        buy_orders = []
+        sell_orders = []
+        # Create orders from the outside in. This is intentional - let's say the inner order gets taken;
+        # then we match orders from the outside in, ensuring the fewest number of orders are amended and only
+        # a new order is created in the inside. If we did it inside-out, all orders would be amended
+        # down and a new order would be created at the outside.
+        logger.info("Current Position: %.f, Funding Rate: %.6f" %
+                    (self.exchange.get_delta(), self.funding_rate))
+
+        data = self.exchange.calc_pts_delta()
+        # profit pts
+        if data['basis'] > 1:
+            if data[symbol]['qty'] > 0:
+                sell_orders.append(self.prepare_order('Sell', symbol))
+            elif data[symbol]['qty'] < 0:
                 buy_orders.append(self.prepare_order('Buy', symbol))
 
         return self.converge_orders(buy_orders, sell_orders, symbol)

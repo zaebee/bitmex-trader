@@ -44,23 +44,57 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             )
 
     async def chat_message(self, event):
+        postOnly = False
+        side = None
         resolved_query = event['message']
         command = resolved_query.upper()
         response = self.prepare_response(resolved_query)
 
-        if command == 'RUN XBTUSD':
-            self.manager.place_orders('XBTUSD')
+        if 'MARKET' in command:
+            postOnly = True
+
+        if 'SELL' in command:
+            side = 'Sell'
+        elif 'BUY' in command:
+            side = 'Buy'
+
+        if 'XBTUSD' in command:
+            self.manager.place_orders('XBTUSD', side)
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Opening orders XBTUSD')
             )
 
-        elif command == 'RUN XBTM18':
-            self.manager.place_orders('XBTM18')
+        elif 'XBTM18' in command:
+            self.manager.place_orders('XBTM18', side)
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Opening orders XBTM18')
             )
 
-        elif command == 'DELTA ON':
+        elif 'CANCEL' == command:
+            self.manager.exchange.cancel_all_orders()
+            response['result']['fulfillment']['messages'].append(
+                self.prepare_message('Orders are cancelled')
+            )
+            self.send(text_data=json.dumps({
+                'message': response
+            }))
+
+        elif 'EXIT' == command:
+            manager = RentOrderManager(symbol='XBTUSD', POST_ONLY=False)
+            manager.init()
+            delta = manager.exchange.calc_pts_delta()
+            if delta['basis'] > 0:
+                self.manager.place_orders('XBTUSD', stop=True)
+                self.manager.place_orders('XBTM18', stop=True)
+            response['result']['fulfillment']['messages'].append(
+                self.prepare_message('Exit')
+            )
+            self.send(text_data=json.dumps({
+                'message': response
+            }))
+
+
+        elif 'DELTA ON' == command:
             delta = self.manager.exchange.calc_pts_delta()
             text = 'Delta: %.4f' % delta.get('basis')
             response['result']['fulfillment']['messages'].append(
@@ -70,7 +104,7 @@ class StrategyConsumer(AsyncWebsocketConsumer):
                 'message': response
             }))
 
-        elif command == 'DELTA':
+        elif 'DELTA' == command:
             delta = self.manager.exchange.calc_pts_delta()
 
             XBTUSD = 'XBTUSD:%s' % str(delta.get('XBTUSD'))
