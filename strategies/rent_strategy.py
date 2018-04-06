@@ -90,10 +90,10 @@ class RentOrderManager(OrderManager):
 
         data = self.exchange.calc_pts_delta()
         # profit pts
-        if data['basis'] > 1:
-            if data[symbol]['qty'] > 0:
-                sell_orders.append(self.prepare_order('Sell', symbol))
-            elif data[symbol]['qty'] < 0:
-                buy_orders.append(self.prepare_order('Buy', symbol))
+        #if data['basis'] > 1:
+        if data[symbol]['qty'] > 0:
+            sell_orders.append(self.prepare_order('Sell', symbol))
+        elif data[symbol]['qty'] < 0:
+            buy_orders.append(self.prepare_order('Buy', symbol))
 
         return self.converge_orders(buy_orders, sell_orders, symbol)

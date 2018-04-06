@@ -64,13 +64,13 @@ class StrategyConsumer(AsyncWebsocketConsumer):
                 self.prepare_message('Opening orders XBTUSD')
             )
 
-        elif 'XBTM18' in command:
+        if 'XBTM18' in command:
             self.manager.place_orders('XBTM18', side)
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Opening orders XBTM18')
             )
 
-        elif 'CANCEL' == command:
+        if 'CANCEL' == command:
             self.manager.exchange.cancel_all_orders()
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Orders are cancelled')
@@ -83,9 +83,9 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             manager = RentOrderManager(POST_ONLY=False)
             manager.init()
             delta = manager.exchange.calc_pts_delta()
-            if delta['basis'] > 0:
-                self.manager.place_stop_orders('XBTUSD')
-                manager.place_stop_orders('XBTM18')
+            # if delta['basis'] > 0:
+            self.manager.place_stop_orders('XBTUSD')
+            manager.place_stop_orders('XBTM18')
             response['result']['fulfillment']['messages'].append(
                 self.prepare_message('Exit')
             )
