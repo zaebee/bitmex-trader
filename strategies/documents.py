@@ -7,6 +7,7 @@ from elasticsearch_dsl import (
 
 
 class Delta(InnerObjectWrapper):
+    orderID = Text(fields={'raw': Keyword()})
     symbol = Text(fields={'raw': Keyword()})
     side = Text(fields={'raw': Keyword()})
 
@@ -22,11 +23,12 @@ class Delta(InnerObjectWrapper):
     def points(self):
         return self.exitPrice - self.enterPrice
 
+
 class Order(DocType):
-    orderID = Text(fields={'raw': Keyword()})
-    qty = Float()
-    status = Text()
+
     comment = Text(fields={'raw': Keyword()})
+    status = Text()
+    qty = Float()
 
     published = Boolean()
     created_at = Date()
@@ -35,10 +37,11 @@ class Order(DocType):
     class Meta:
         index = 'bitmex'
 
-    def add_comment(self, author, content):
-        self.comments.append(
-          Comment(author=author, content=content, created_at=datetime.now()))
+    def add_delta(self, **kwargs):
+        self.delta_series.append(
+            Delta(created_at=datetime.now(), **kwargs)
+        )
 
-    def save(self, ** kwargs):
+    def save(self, **kwargs):
         self.created_at = datetime.now()
-        return super().save(** kwargs)
+        return super().save(**kwargs)

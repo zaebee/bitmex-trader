@@ -44,14 +44,10 @@ class StrategyConsumer(AsyncWebsocketConsumer):
             )
 
     async def chat_message(self, event):
-        postOnly = False
         side = None
         resolved_query = event['message']
         command = resolved_query.upper()
         response = self.prepare_response(resolved_query)
-
-        if 'MARKET' in command:
-            postOnly = True
 
         if 'SELL' in command:
             side = 'Sell'
@@ -124,6 +120,9 @@ class StrategyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': response
         }))
+
+    async def predict(self, query):
+        pass
 
     def prepare_response(self, query):
         return {
