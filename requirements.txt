@@ -17,7 +17,7 @@ constantly==15.1.0
 cssmin==0.2.0
 daphne==2.1.0
 decorator==4.2.1
-Django==2.0.4
+Django==2.2.10
 django-extensions==1.7.6
 djangorestframework==3.5.3
 future==0.16.0
