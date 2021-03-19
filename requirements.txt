@@ -19,7 +19,7 @@ daphne==2.1.0
 decorator==4.2.1
 Django==2.0.4
 django-extensions==1.7.6
-djangorestframework==3.5.3
+djangorestframework==3.11.2
 future==0.16.0
 gis==0.2.1
 h2==2.6.2
