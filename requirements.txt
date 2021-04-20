@@ -3,7 +3,7 @@ alog==0.9.13
 asgiref==2.2.0
 async-timeout==2.0.1
 attrs==17.4.0
-autobahn==18.3.1
+autobahn==20.12.3
 Automat==0.6.0
 bitmex==0.2.2
 bitmex-websocket==0.1.180
