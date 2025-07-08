@@ -30,7 +30,7 @@ httpie-http2==0.0.1
 hyper==0.7.0
 hyperframe==3.2.0
 hyperlink==18.0.0
-idna==2.6
+idna==3.7
 incremental==17.5.0
 ipdb==0.11
 ipython==6.2.1
