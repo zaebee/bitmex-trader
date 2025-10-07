@@ -49,7 +49,7 @@ Pillow==10.3.0
 psycopg2==2.7.1
 ptyprocess==0.5.2
 pyee==3.0.3
-Pygments==2.2.0
+Pygments==2.7.4
 python-dateutil==2.7.0
 pytils==0.3
 pytz==2018.3
