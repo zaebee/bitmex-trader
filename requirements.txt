@@ -22,7 +22,7 @@ django-extensions==1.7.6
 djangorestframework==3.11.2
 future==1.0.0
 gis==0.2.1
-h2==2.6.2
+h2==4.3.0
 hiredis==0.2.0
 hpack==3.0.0
 httpie==0.9.9
